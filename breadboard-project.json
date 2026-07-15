@@ -1,0 +1,743 @@
+{
+  "format": "velxio-project",
+  "version": 1,
+  "boards": [
+    {
+      "id": "esp32",
+      "boardKind": "esp32",
+      "x": -892.6155665234072,
+      "y": 101.38630935844054,
+      "activeFileGroupId": "group-esp32",
+      "languageMode": "arduino",
+      "serialBaudRate": 0
+    }
+  ],
+  "fileGroups": {
+    "group-esp32": [
+      {
+        "name": "sketch.ino",
+        "content": "#include <SPI.h>\n#include <Wire.h>\n#include <Adafruit_GFX.h>\n#include <Adafruit_SSD1306.h>\n#include <DHT.h>\n\n#define SCREEN_WIDTH 128\n#define SCREEN_HEIGHT 64\n#define OLED_RESET    -1\nAdafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);\n\n#define DHTPIN 4       \n#define DHTTYPE DHT11\nDHT dht(DHTPIN, DHTTYPE);\n\n#define PIR_PIN 15     \n#define LDR_PIN 34     \n#define BUZZER_PIN 27  \n\n#define RED_PIN 12     \n#define GREEN_PIN 13   \n#define BLUE_PIN 14    \n\n\nvoid setColor(int red, int green, int blue);\n\nvoid setup() {\n  Serial.begin(115200); \n  \n  \n  analogReadResolution(10); \n  \n  \n  if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { \n    Serial.println(F(\"SSD1306 OLED initialization failed!\"));\n    for(;;);\n  }\n  display.clearDisplay();\n  display.setTextColor(SSD1306_WHITE);\n  \n  \n  dht.begin();\n  \n \n  pinMode(PIR_PIN, INPUT);\n  pinMode(LDR_PIN, INPUT);\n  pinMode(BUZZER_PIN, OUTPUT);\n  pinMode(RED_PIN, OUTPUT);\n  pinMode(GREEN_PIN, OUTPUT);\n  pinMode(BLUE_PIN, OUTPUT);\n  \n \n  setColor(0, 255, 0); \n  tone(BUZZER_PIN, 1500, 200);\n  delay(200);\n  setColor(0, 0, 0);\n}\n\nvoid loop() {\n  float temp = dht.readTemperature();\n  float hum = dht.readHumidity();\n  int pirState = digitalRead(PIR_PIN);\n  int ldrVal = analogRead(LDR_PIN); \n\n  if (isnan(temp) || isnan(hum)) {\n    temp = 0.0;\n    hum = 0.0;\n  }\n\n  \n  if (pirState == HIGH) {\n    display.clearDisplay();\n    display.setTextSize(2);\n    display.setCursor(10, 10);\n    display.print(\"WARNING!\");\n    display.setTextSize(1);\n    display.setCursor(10, 40);\n    display.print(\"Motion Detected!\");\n    display.display();\n    \n    for (int i = 0; i < 3; i++) {\n      setColor(255, 0, 0); \n      tone(BUZZER_PIN, 1000);\n      delay(150);\n      setColor(0, 0, 0);\n      noTone(BUZZER_PIN);\n      delay(150);\n    }\n  } \n  \n  \n  else if (ldrVal < 300) {\n    setColor(0, 50, 150); \n    \n    display.clearDisplay();\n    display.setTextSize(1);\n    display.setCursor(0, 0);\n    display.print(\"--- NIGHT MODE ---\");\n    display.setCursor(0, 20);\n    display.print(\"Temp: \"); display.print(temp, 1); display.print(\" C\");\n    display.setCursor(0, 35);\n    display.print(\"Hum : \"); display.print(hum, 1); display.print(\" %\");\n    display.setCursor(0, 50);\n    display.print(\"LDR Value: \"); display.print(ldrVal);\n    display.display();\n    \n    noTone(BUZZER_PIN);\n    delay(1000); \n  } \n  \n \n  else {\n    setColor(0, 0, 0); \n    noTone(BUZZER_PIN);\n    \n    display.clearDisplay();\n    display.setTextSize(1);\n    display.setCursor(0, 0);\n    display.print(\"--- SMART DESK ---\");\n    \n    display.setTextSize(2);\n    display.setCursor(0, 20);\n    display.print(temp, 1); display.write(247); display.print(\"C\"); \n    \n    display.setTextSize(1);\n    display.setCursor(0, 45);\n    display.print(\"Humidity: \"); display.print(hum, 1); display.print(\"%\");\n    display.setCursor(0, 55);\n    display.print(\"Status: Active\");\n    display.display();\n    \n    delay(1000);\n  }\n}\n\n\nvoid setColor(int red, int green, int blue) {\n  analogWrite(RED_PIN, red);\n  analogWrite(GREEN_PIN, green);\n  analogWrite(BLUE_PIN, blue);\n}"
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "breadboard_full_1784133829657_1galf7gqb",
+      "metadataId": "breadboard-full",
+      "x": -412.45523687334975,
+      "y": 205.30098323092602,
+      "properties": {}
+    },
+    {
+      "id": "ssd1306_i2c_1784133832416_fhr6ocz5c",
+      "metadataId": "ssd1306-i2c",
+      "x": -117.41764360114072,
+      "y": 12.521844398938072,
+      "properties": {
+        "protocol": "i2c",
+        "rotation": 0
+      }
+    },
+    {
+      "id": "pir_motion_sensor_1784133848271_b0bxo6gf9",
+      "metadataId": "pir-motion-sensor",
+      "x": -229.45355028508013,
+      "y": 42.9622836665658,
+      "properties": {}
+    },
+    {
+      "id": "dht11_1784133867147_tt6zyziq1",
+      "metadataId": "dht11",
+      "x": 94.11622067898942,
+      "y": 58.5752399798357,
+      "properties": {
+        "temperature": 25,
+        "humidity": 50
+      }
+    },
+    {
+      "id": "rgb_led_1784133935817_6n0huf4h7",
+      "metadataId": "rgb-led",
+      "x": -528.4462116305663,
+      "y": 194.0251963523599,
+      "properties": {
+        "ledRed": 0,
+        "ledGreen": 0,
+        "ledBlue": 0
+      }
+    },
+    {
+      "id": "photoresistor_sensor_1784133955176_l92nhrjxp",
+      "metadataId": "photoresistor-sensor",
+      "x": -546.9245604605226,
+      "y": -95.7744441364872,
+      "properties": {
+        "ledDO": false,
+        "ledPower": false,
+        "rotation": 90
+      }
+    },
+    {
+      "id": "buzzer_passive_1784133982111_sq58e4oci",
+      "metadataId": "buzzer-passive",
+      "x": -316.07032080878673,
+      "y": -87.21646045118345,
+      "properties": {
+        "active": false
+      }
+    },
+    {
+      "id": "resistor_1784135840023_vb3gdiwpn",
+      "metadataId": "resistor",
+      "x": -558.6037445121751,
+      "y": 302.0706260623224,
+      "properties": {
+        "value": "220",
+        "rotation": 90
+      }
+    },
+    {
+      "id": "resistor_1784136022849_qjr9mxypx",
+      "metadataId": "resistor",
+      "x": -601.0103303814736,
+      "y": 300.58267568094345,
+      "properties": {
+        "value": "220",
+        "rotation": 90
+      }
+    },
+    {
+      "id": "resistor_1784136026018_gk1byh7s5",
+      "metadataId": "resistor",
+      "x": -580.9230002328586,
+      "y": 300.58267568094345,
+      "properties": {
+        "value": "220",
+        "rotation": 90
+      }
+    }
+  ],
+  "wires": [
+    {
+      "waypoints": [
+        {
+          "x": -866.6095529573041,
+          "y": 308.52043132934756
+        },
+        {
+          "x": -866.6095529573041,
+          "y": 323.04020149579196
+        },
+        {
+          "x": -784.7722024817681,
+          "y": 323.04020149579196
+        },
+        {
+          "x": -684.3527776651403,
+          "y": 323.04020149579196
+        },
+        {
+          "x": -684.3527776651403,
+          "y": 566.2588453943273
+        },
+        {
+          "x": -442.7532957956124,
+          "y": 566.2588453943273
+        },
+        {
+          "x": -442.7532957956124,
+          "y": 194.4166639677716
+        },
+        {
+          "x": -381.45523687334975,
+          "y": 194.4166639677716
+        }
+      ],
+      "id": "wire-1784134127752",
+      "start": {
+        "componentId": "esp32",
+        "pinName": "VIN",
+        "x": -886.6155665234072,
+        "y": 308.38630935844054
+      },
+      "end": {
+        "componentId": "breadboard_full_1784133829657_1galf7gqb",
+        "pinName": "TP1",
+        "x": -381.45523687334975,
+        "y": 228.30098323092602
+      },
+      "color": "#cc0000"
+    },
+    {
+      "waypoints": [
+        {
+          "x": -887.0348812228053,
+          "y": 295.52043132934756
+        },
+        {
+          "x": -887.0348812228053,
+          "y": 345.0367088586393
+        },
+        {
+          "x": -701.6357477359489,
+          "y": 345.0367088586393
+        },
+        {
+          "x": -701.6357477359489,
+          "y": 582.2847525579216
+        },
+        {
+          "x": -425.1082266030106,
+          "y": 582.2847525579216
+        },
+        {
+          "x": -425.1082266030106,
+          "y": 241.30098323092602
+        }
+      ],
+      "id": "wire-1784134291954",
+      "start": {
+        "componentId": "esp32",
+        "pinName": "GND",
+        "x": -886.6155665234072,
+        "y": 295.38630935844054
+      },
+      "end": {
+        "componentId": "breadboard_full_1784133829657_1galf7gqb",
+        "pinName": "TN1",
+        "x": -381.45523687334975,
+        "y": 241.30098323092602
+      },
+      "color": "#000000"
+    },
+    {
+      "waypoints": [],
+      "id": "wire-1784134353496",
+      "start": {
+        "componentId": "photoresistor_sensor_1784133955176_l92nhrjxp",
+        "pinName": "VCC",
+        "x": -423.42456046052257,
+        "y": 42.725555863512795
+      },
+      "end": {
+        "componentId": "breadboard_full_1784133829657_1galf7gqb",
+        "pinName": "TP2",
+        "x": -371.8552368733497,
+        "y": 228.30098323092602
+      },
+      "color": "#cc0000"
+    },
+    {
+      "waypoints": [],
+      "id": "wire-1784134375683",
+      "start": {
+        "componentId": "buzzer_passive_1784133982111_sq58e4oci",
+        "pinName": "+",
+        "x": -296.07032080878673,
+        "y": -23.21646045118345
+      },
+      "end": {
+        "componentId": "breadboard_full_1784133829657_1galf7gqb",
+        "pinName": "TP3",
+        "x": -362.25523687334976,
+        "y": 228.30098323092602
+      },
+      "color": "#cc0000"
+    },
+    {
+      "waypoints": [],
+      "id": "wire-1784134381666",
+      "start": {
+        "componentId": "pir_motion_sensor_1784133848271_b0bxo6gf9",
+        "pinName": "VCC",
+        "x": -187.27555028508013,
+        "y": 140.9622836665658
+      },
+      "end": {
+        "componentId": "breadboard_full_1784133829657_1galf7gqb",
+        "pinName": "TP4",
+        "x": -352.65523687334974,
+        "y": 228.30098323092602
+      },
+      "color": "#cc0000"
+    },
+    {
+      "waypoints": [
+        {
+          "x": -554.1874552365548,
+          "y": 134.3226770570947
+        },
+        {
+          "x": -554.1874552365548,
+          "y": -212.93234134281178
+        },
+        {
+          "x": -31.417643601140725,
+          "y": -212.93234134281178
+        }
+      ],
+      "id": "wire-1784135266775",
+      "start": {
+        "componentId": "esp32",
+        "pinName": "22",
+        "x": -758.6155665234072,
+        "y": 143.38630935844054
+      },
+      "end": {
+        "componentId": "ssd1306_i2c_1784133832416_fhr6ocz5c",
+        "pinName": "SCL",
+        "x": -31.417643601140725,
+        "y": 23.52184439893807
+      },
+      "color": "#22c55e"
+    },
+    {
+      "waypoints": [
+        {
+          "x": -584.6889275311305,
+          "y": 172.3226770570947
+        },
+        {
+          "x": -584.6889275311305,
+          "y": -245.46724512369263
+        },
+        {
+          "x": -21.417643601140725,
+          "y": -245.46724512369263
+        }
+      ],
+      "id": "wire-1784135278401",
+      "start": {
+        "componentId": "esp32",
+        "pinName": "21",
+        "x": -758.6155665234072,
+        "y": 181.38630935844054
+      },
+      "end": {
+        "componentId": "ssd1306_i2c_1784133832416_fhr6ocz5c",
+        "pinName": "SDA",
+        "x": -21.417643601140725,
+        "y": 23.52184439893807
+      },
+      "color": "#22c55e"
+    },
+    {
+      "waypoints": [
+        {
+          "x": 118.11622067898942,
+          "y": 6.109367581069394
+        },
+        {
+          "x": -333.45523687334975,
+          "y": 6.109367581069394
+        }
+      ],
+      "id": "wire-1784135357254",
+      "start": {
+        "componentId": "dht11_1784133867147_tt6zyziq1",
+        "pinName": "VCC",
+        "x": 118.11622067898942,
+        "y": 136.57523997983571
+      },
+      "end": {
+        "componentId": "breadboard_full_1784133829657_1galf7gqb",
+        "pinName": "TP6",
+        "x": -333.45523687334975,
+        "y": 228.30098323092602
+      },
+      "color": "#cc0000"
+    },
+    {
+      "waypoints": [
+        {
+          "x": -625.4873291654536,
+          "y": -287.7825825147774
+        },
+        {
+          "x": 101.26410502723914,
+          "y": -287.7825825147774
+        },
+        {
+          "x": 101.26410502723914,
+          "y": 152.88551967255293
+        },
+        {
+          "x": 143.1162206789894,
+          "y": 152.88551967255293
+        }
+      ],
+      "id": "wire-1784135406934",
+      "start": {
+        "componentId": "esp32",
+        "pinName": "4",
+        "x": -758.6155665234072,
+        "y": 257.38630935844054
+      },
+      "end": {
+        "componentId": "dht11_1784133867147_tt6zyziq1",
+        "pinName": "SDA",
+        "x": 143.1162206789894,
+        "y": 136.57523997983571
+      },
+      "color": "#22c55e"
+    },
+    {
+      "waypoints": [
+        {
+          "x": -696.7110663495677,
+          "y": 152.88551967255293
+        },
+        {
+          "x": -177.53605028508014,
+          "y": 152.88551967255293
+        }
+      ],
+      "id": "wire-1784135564161",
+      "start": {
+        "componentId": "esp32",
+        "pinName": "15",
+        "x": -758.6155665234072,
+        "y": 282.38630935844054
+      },
+      "end": {
+        "componentId": "pir_motion_sensor_1784133848271_b0bxo6gf9",
+        "pinName": "OUT",
+        "x": -177.53605028508014,
+        "y": 140.9622836665658
+      },
+      "color": "#22c55e"
+    },
+    {
+      "waypoints": [
+        {
+          "x": -931.1560635463612,
+          "y": 168.38630935844054
+        },
+        {
+          "x": -931.1560635463612,
+          "y": 76.95650256628657
+        },
+        {
+          "x": -452.92456046052257,
+          "y": 76.95650256628657
+        }
+      ],
+      "id": "wire-1784135761157",
+      "start": {
+        "componentId": "esp32",
+        "pinName": "34",
+        "x": -886.6155665234072,
+        "y": 168.38630935844054
+      },
+      "end": {
+        "componentId": "photoresistor_sensor_1784133955176_l92nhrjxp",
+        "pinName": "AO",
+        "x": -452.92456046052257,
+        "y": 42.725555863512795
+      },
+      "color": "#22c55e"
+    },
+    {
+      "waypoints": [],
+      "id": "wire-1784135808730",
+      "start": {
+        "componentId": "rgb_led_1784133935817_6n0huf4h7",
+        "pinName": "COM",
+        "x": -504.44621163056627,
+        "y": 254.0251963523599
+      },
+      "end": {
+        "componentId": "breadboard_full_1784133829657_1galf7gqb",
+        "pinName": "TP13",
+        "x": -266.25523687334976,
+        "y": 228.30098323092602
+      },
+      "color": "#000000"
+    },
+    {
+      "waypoints": [],
+      "id": "wire-1784136081499",
+      "start": {
+        "componentId": "rgb_led_1784133935817_6n0huf4h7",
+        "pinName": "R",
+        "x": -513.9462116305663,
+        "y": 244.0251963523599
+      },
+      "end": {
+        "componentId": "resistor_1784136022849_qjr9mxypx",
+        "pinName": "1",
+        "x": -529.1603303814736,
+        "y": 272.08267568094345
+      },
+      "color": "#cc0000"
+    },
+    {
+      "waypoints": [],
+      "id": "wire-1784136095961",
+      "start": {
+        "componentId": "rgb_led_1784133935817_6n0huf4h7",
+        "pinName": "G",
+        "x": -496.0462116305663,
+        "y": 244.0251963523599
+      },
+      "end": {
+        "componentId": "resistor_1784136026018_gk1byh7s5",
+        "pinName": "1",
+        "x": -509.0730002328586,
+        "y": 272.08267568094345
+      },
+      "color": "#22c55e"
+    },
+    {
+      "waypoints": [],
+      "id": "wire-1784136103169",
+      "start": {
+        "componentId": "rgb_led_1784133935817_6n0huf4h7",
+        "pinName": "B",
+        "x": -486.7462116305663,
+        "y": 244.0251963523599
+      },
+      "end": {
+        "componentId": "resistor_1784135840023_vb3gdiwpn",
+        "pinName": "1",
+        "x": -486.7537445121751,
+        "y": 273.5706260623224
+      },
+      "color": "#0000cc"
+    },
+    {
+      "waypoints": [
+        {
+          "x": -917.5560178098422,
+          "y": 270.38630935844054
+        },
+        {
+          "x": -917.5560178098422,
+          "y": 398.16098189143867
+        },
+        {
+          "x": -529.1603303814736,
+          "y": 398.16098189143867
+        }
+      ],
+      "id": "wire-1784136252685",
+      "start": {
+        "componentId": "esp32",
+        "pinName": "12",
+        "x": -886.6155665234072,
+        "y": 270.38630935844054
+      },
+      "end": {
+        "componentId": "resistor_1784136022849_qjr9mxypx",
+        "pinName": "2",
+        "x": -529.1603303814736,
+        "y": 330.8826756809434
+      },
+      "color": "#22c55e"
+    },
+    {
+      "waypoints": [
+        {
+          "x": -906.9782044592162,
+          "y": 282.38630935844054
+        },
+        {
+          "x": -906.9782044592162,
+          "y": 383.049819961973
+        },
+        {
+          "x": -509.0730002328586,
+          "y": 383.049819961973
+        }
+      ],
+      "id": "wire-1784136258770",
+      "start": {
+        "componentId": "esp32",
+        "pinName": "13",
+        "x": -886.6155665234072,
+        "y": 282.38630935844054
+      },
+      "end": {
+        "componentId": "resistor_1784136026018_gk1byh7s5",
+        "pinName": "2",
+        "x": -509.0730002328586,
+        "y": 330.8826756809434
+      },
+      "color": "#22c55e"
+    },
+    {
+      "waypoints": [
+        {
+          "x": -931.1560635463612,
+          "y": 257.38630935844054
+        },
+        {
+          "x": -931.1560635463612,
+          "y": 422.33884097858373
+        },
+        {
+          "x": -486.7462116305663,
+          "y": 422.33884097858373
+        },
+        {
+          "x": -486.7462116305663,
+          "y": 332.3706260623224
+        }
+      ],
+      "id": "wire-1784136265902",
+      "start": {
+        "componentId": "esp32",
+        "pinName": "14",
+        "x": -886.6155665234072,
+        "y": 257.38630935844054
+      },
+      "end": {
+        "componentId": "resistor_1784135840023_vb3gdiwpn",
+        "pinName": "2",
+        "x": -486.7537445121751,
+        "y": 332.3706260623224
+      },
+      "color": "#22c55e"
+    },
+    {
+      "waypoints": [
+        {
+          "x": -41.417643601140725,
+          "y": 13.6506233237207
+        },
+        {
+          "x": -227.85523687334975,
+          "y": 13.6506233237207
+        }
+      ],
+      "id": "wire-1784136784776",
+      "start": {
+        "componentId": "ssd1306_i2c_1784133832416_fhr6ocz5c",
+        "pinName": "VCC",
+        "x": -41.417643601140725,
+        "y": 23.52184439893807
+      },
+      "end": {
+        "componentId": "breadboard_full_1784133829657_1galf7gqb",
+        "pinName": "TP17",
+        "x": -227.85523687334975,
+        "y": 228.30098323092602
+      },
+      "color": "#cc0000"
+    },
+    {
+      "waypoints": [
+        {
+          "x": -294.29174486265896,
+          "y": 116.10180940102062
+        }
+      ],
+      "id": "wire-1784136885601",
+      "start": {
+        "componentId": "photoresistor_sensor_1784133955176_l92nhrjxp",
+        "pinName": "GND",
+        "x": -433.42456046052257,
+        "y": 42.725555863512795
+      },
+      "end": {
+        "componentId": "breadboard_full_1784133829657_1galf7gqb",
+        "pinName": "TN10",
+        "x": -295.05523687334977,
+        "y": 241.30098323092602
+      },
+      "color": "#000000"
+    },
+    {
+      "waypoints": [],
+      "id": "wire-1784136891098",
+      "start": {
+        "componentId": "buzzer_passive_1784133982111_sq58e4oci",
+        "pinName": "-",
+        "x": -256.07032080878673,
+        "y": -23.21646045118345
+      },
+      "end": {
+        "componentId": "breadboard_full_1784133829657_1galf7gqb",
+        "pinName": "TN14",
+        "x": -256.65523687334974,
+        "y": 241.30098323092602
+      },
+      "color": "#000000"
+    },
+    {
+      "waypoints": [],
+      "id": "wire-1784136912190",
+      "start": {
+        "componentId": "ssd1306_i2c_1784133832416_fhr6ocz5c",
+        "pinName": "GND",
+        "x": -51.417643601140725,
+        "y": 23.52184439893807
+      },
+      "end": {
+        "componentId": "breadboard_full_1784133829657_1galf7gqb",
+        "pinName": "TN15",
+        "x": -247.05523687334974,
+        "y": 241.30098323092602
+      },
+      "color": "#000000"
+    },
+    {
+      "waypoints": [
+        {
+          "x": 168.1162206789894,
+          "y": 163.34400850490255
+        },
+        {
+          "x": -237.45523687334975,
+          "y": 163.34400850490255
+        }
+      ],
+      "id": "wire-1784136918176",
+      "start": {
+        "componentId": "dht11_1784133867147_tt6zyziq1",
+        "pinName": "GND",
+        "x": 168.1162206789894,
+        "y": 136.57523997983571
+      },
+      "end": {
+        "componentId": "breadboard_full_1784133829657_1galf7gqb",
+        "pinName": "TN16",
+        "x": -237.45523687334975,
+        "y": 241.30098323092602
+      },
+      "color": "#000000"
+    },
+    {
+      "waypoints": [
+        {
+          "x": -173.05696220602886,
+          "y": 140.9622836665658
+        },
+        {
+          "x": -173.05696220602886,
+          "y": 206.25611225684136
+        },
+        {
+          "x": -227.85523687334975,
+          "y": 206.25611225684136
+        }
+      ],
+      "id": "wire-1784136928839",
+      "start": {
+        "componentId": "pir_motion_sensor_1784133848271_b0bxo6gf9",
+        "pinName": "GND",
+        "x": -167.81205028508012,
+        "y": 140.9622836665658
+      },
+      "end": {
+        "componentId": "breadboard_full_1784133829657_1galf7gqb",
+        "pinName": "TN17",
+        "x": -227.85523687334975,
+        "y": 241.30098323092602
+      },
+      "color": "#000000"
+    }
+  ],
+  "activeBoardId": "esp32",
+  "ignoreStock": false
+}
